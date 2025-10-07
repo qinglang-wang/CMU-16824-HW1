@@ -64,13 +64,19 @@ class VOCDataset(Dataset):
             # https://docs.python.org/3/library/xml.etree.elementtree.html)
             # Loop through the `tree` to find all objects in the image
             #######################################################################
-
             #  The class vector should be a 20-dimensional vector with class[i] = 1 if an object of class i is present in the image and 0 otherwise
             class_vec = torch.zeros(20)
 
             # The weight vector should be a 20-dimensional vector with weight[i] = 0 iff an object of class i has the `difficult` attribute set to 1 in the XML file and 1 otherwise
             # The difficult attribute specifies whether a class is ambiguous and by setting its weight to zero it does not contribute to the loss during training 
             weight_vec = torch.ones(20)
+
+            root = tree.getroot()
+            for obj in root.findall('object'):
+                cls_id = self.get_class_index(obj.find('name').text)
+                class_vec[cls_id] = 1
+                if obj.find('difficult').text == 1:
+                    weight_vec[cls_id] = 0
 
             ######################################################################
             #                            END OF YOUR CODE                        #
@@ -92,7 +98,33 @@ class VOCDataset(Dataset):
         # change and you will have to write the correct value of `flat_dim`
         # in line 46 in simple_cnn.py
         ######################################################################
-        pass
+        if self.split == 'trainval':
+            # Enable Augumentation
+            augmentations = [
+                transforms.RandomResizedCrop(self.size, scale=(0.6, 1.0)),
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.RandAugment(num_ops=3),
+            ]
+
+            # augmentations = [
+            #     transforms.RandomResizedCrop(self.size, scale=(0.6, 1.0)),
+            #     transforms.RandomHorizontalFlip(p=0.5),
+            #     transforms.RandomApply([transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.1)], p=0.5),
+            #     transforms.RandomGrayscale(p=0.2),
+            #     transforms.RandomRotation(30),
+            # ]
+
+        elif self.split == 'test':
+            augmentations = [
+                transforms.Resize(self.size + 32),
+                transforms.CenterCrop(self.size),
+            ]
+        return augmentations
+                
+        # # Disable Augumentation
+        # augmentations = []
+        # return augmentations
+        
         ######################################################################
         #                            END OF YOUR CODE                        #
         ######################################################################
@@ -111,7 +143,7 @@ class VOCDataset(Dataset):
         img = Image.open(fpath)
 
         trans = transforms.Compose([
-            transforms.Resize(self.size),
+            transforms.Resize((self.size, self.size)),
             *self.get_random_augmentations(),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.457, 0.407], std=[0.229, 0.224, 0.225]),
@@ -122,5 +154,4 @@ class VOCDataset(Dataset):
         image = torch.FloatTensor(img)
         label = torch.FloatTensor(lab_vec)
         wgt = torch.FloatTensor(wgt_vec)
-
         return image, label, wgt
