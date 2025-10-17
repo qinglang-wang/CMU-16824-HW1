@@ -17,7 +17,8 @@ class ResNet(nn.Module):
         ##################################################################
         # TODO: Define a FC layer here to process the features
         ##################################################################
-        pass
+        fc_in_features = self.resnet.fc.in_features
+        self.resnet.fc = nn.Linear(fc_in_features, num_classes)
         ##################################################################
         #                          END OF YOUR CODE                      #
         ##################################################################
@@ -27,7 +28,7 @@ class ResNet(nn.Module):
         ##################################################################
         # TODO: Return raw outputs here
         ##################################################################
-        pass
+        return self.resnet(x)
         ##################################################################
         #                          END OF YOUR CODE                      #
         ##################################################################
@@ -45,16 +46,18 @@ if __name__ == "__main__":
     # You should experiment and choose the correct hyperparameters
     # You should get a map of around 50 in 50 epochs
     ##################################################################
-    # args = ARGS(
-    #     epochs=50,
-    #     inp_size=64,
-    #     use_cuda=True,
-    #     val_every=70
-    #     lr=# TODO,
-    #     batch_size=#TODO,
-    #     step_size=#TODO,
-    #     gamma=#TODO
-    # )
+    args = ARGS(
+        epochs=50,
+        inp_size=224,
+        use_cuda=True,
+        val_every=40,
+        lr=1e-3,
+        batch_size=16,
+        step_size=10,
+        gamma=0.3,
+        test_batch_size=128,
+        save_freq=1
+    )
     ##################################################################
     #                          END OF YOUR CODE                      #
     ##################################################################
@@ -66,7 +69,6 @@ if __name__ == "__main__":
     # Initialize this model with ImageNet pre-trained weights
     # (except the last layer). You are free to use torchvision.models 
     ##################################################################
-
     model = ResNet(len(VOCDataset.CLASS_NAMES)).to(args.device)
 
     ##################################################################
