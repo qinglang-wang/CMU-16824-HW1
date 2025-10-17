@@ -53,7 +53,10 @@ def train(args, model, optimizer, scheduler=None, model_name='model'):
             # Function Outputs:
             #   - `output`: Computed loss, a single floating point number
             ##################################################################
-            loss = 0
+            y_hat = 1 / (1 + torch.exp(-output))
+            epsilon = 1e-9
+            loss = -torch.mean(target*torch.log(y_hat+epsilon) + (1-target)*torch.log(1-y_hat+epsilon))
+
             ##################################################################
             #                          END OF YOUR CODE                      #
             ##################################################################
