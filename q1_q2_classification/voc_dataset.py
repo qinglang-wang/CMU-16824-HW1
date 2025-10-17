@@ -98,32 +98,32 @@ class VOCDataset(Dataset):
         # change and you will have to write the correct value of `flat_dim`
         # in line 46 in simple_cnn.py
         ######################################################################
-        if self.split == 'trainval':
-            # Enable Augumentation
-            augmentations = [
-                transforms.RandomResizedCrop(self.size, scale=(0.6, 1.0)),
-                transforms.RandomHorizontalFlip(p=0.5),
-                transforms.RandAugment(num_ops=3),
-            ]
+        # # Enable Augumentation
+        # if self.split == 'trainval':
+        #     augmentations = [
+        #         transforms.RandomResizedCrop(self.size, scale=(0.6, 1.0)),
+        #         transforms.RandomHorizontalFlip(p=0.5),
+        #         transforms.RandAugment(num_ops=3),
+        #     ]
 
-            # augmentations = [
-            #     transforms.RandomResizedCrop(self.size, scale=(0.6, 1.0)),
-            #     transforms.RandomHorizontalFlip(p=0.5),
-            #     transforms.RandomApply([transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.1)], p=0.5),
-            #     transforms.RandomGrayscale(p=0.2),
-            #     transforms.RandomRotation(30),
-            # ]
+        #     # augmentations = [
+        #     #     transforms.RandomResizedCrop(self.size, scale=(0.6, 1.0)),
+        #     #     transforms.RandomHorizontalFlip(p=0.5),
+        #     #     transforms.RandomApply([transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.1)], p=0.5),
+        #     #     transforms.RandomGrayscale(p=0.2),
+        #     #     transforms.RandomRotation(30),
+        #     # ]
 
-        elif self.split == 'test':
-            augmentations = [
-                transforms.Resize(self.size + 32),
-                transforms.CenterCrop(self.size),
-            ]
-        return augmentations
-                
-        # # Disable Augumentation
-        # augmentations = []
+        # elif self.split == 'test':
+        #     augmentations = [
+        #         transforms.Resize(self.size + 32),
+        #         transforms.CenterCrop(self.size),
+        #     ]
         # return augmentations
+
+        # Disable Augumentation
+        augmentations = []
+        return augmentations
         
         ######################################################################
         #                            END OF YOUR CODE                        #
